@@ -429,5 +429,3 @@ def enable_external_display():
     The function reverts the operation of meth:`pygmt.disable_external_display`.
     """
     SHOW_CONFIG["external"] = True
-
-
