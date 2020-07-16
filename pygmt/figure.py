@@ -413,19 +413,17 @@ class Figure(BasePlotting):
         return html.format(image=base64_png.decode("utf-8"), width=500)
 
 
-def disable_external_display():
+def set_display(mode):
     """
-    Do not open a preview in external viewers.
-
-    The function is required when building the documentation.
+    Set the display mode.
     """
-    SHOW_CONFIG["external"] = False
-
-
-def enable_external_display():
-    """
-    Enable opening a preview in external viewers.
-
-    The function reverts the operation of meth:`pygmt.disable_external_display`.
-    """
-    SHOW_CONFIG["external"] = True
+    if mode == "notebook":
+        SHOW_CONFIG["inline"] = True
+        SHOW_CONFIG["external"] = False
+    elif mode == "external":
+        SHOW_CONFIG["inline"] = False
+        SHOW_CONFIG["external"] = True
+    else:
+        raise GMTInvalidInput(
+            f'Invalid display mode {mode}, should be either "notebook" or "external".'
+        )
