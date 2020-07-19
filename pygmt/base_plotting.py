@@ -994,3 +994,197 @@ class BasePlotting:
 
                 arg_str = " ".join([fname, build_arg_string(kwargs)])
                 lib.call_module("text", arg_str)
+
+
+
+    # @fmt_docstring
+    @use_alias(
+        R="region",
+        J="projection",
+        B="frame",
+        S="format",
+        Sa="akr", # aki and richards fmt
+        Sc='gcmt', # global cmt fmt
+        Sm='mt', # moment tensor fmt
+        Sp='partial', # partial data fmt
+        G="color",
+        W="pen",
+        l="label",
+        C="offset", # last cols of table are the offset values
+        U="timestamp",
+        D="deprange",
+    )
+    @kwargs_to_strings(R="sequence", D="sequence")
+    def meca(self, table=None, **kwargs):
+        """
+        Plot focal mechanisms on a map.
+
+        Refers to psmeca.
+
+        {aliases}
+
+        Parameters
+        ----------
+        table : str or 2d array
+            Either a data file name or a 2d numpy array with the tabular data.
+            Columns must correspond with order required for Sa, Sc or Sm options.
+
+     
+        {S}<format><scale>[+aangle][+ffont][+jjustify][+odx[/dy]]
+
+            Selects the meaning of the columns in the data file. scale adjusts 
+            the scaling of the radius of the “beach ball”, which will be 
+            proportional to the magnitude. scale is the size for magnitude = 
+            5 (i.e. scalar seismic moment M0 = 4.0E23 dynes-cm). 
+            The color or shade of the compressive quadrants can be specified 
+            with the -G option. The color or shade of the extensive quadrants 
+            can be specified with the -E option. For each beachball, a text 
+            string can be specified to appear near the beachball [optional]. 
+            Append +aangle to change the angle of the text string; 
+            append +ffont to change its font (size,fontname,color); append 
+            +jjustify to change the text location relative to the beachball 
+            (default is above the beachball); append +o to offset the text 
+            string by dx/dy.
+
+            In order to use the same file to plot cross-sections, depth is in 
+            third column. Nevertheless, it is possible to use “old style” 
+            psvelomeca input files without depth in third column using the 
+            -Fo option.
+        
+        {Sa}Sascale[+ffont][+jjustify][+odx[/dy]]
+
+            Focal mechanisms in Aki and Richards convention. Parameters are 
+            expected to be in the following columns:
+
+            1,2: longitude, latitude of event (-: option interchanges order)
+
+            3: depth of event in kilometers
+
+            4,5,6: strike, dip and rake in degrees
+
+            7: magnitude
+
+            8,9: longitude, latitude at which to place beachball if -C is used 
+            (optional). Using 0,0 in columns 8 and 9 will plot the beach ball at 
+            the longitude, latitude given in columns 1 and 2. The -: option will 
+            interchange the order of columns (1,2) and (8,9).
+
+            10: Text string to appear near the beach ball (optional).
+            {Sc}scale[+ffont][+jjustify][+odx[/dy]]
+
+            Focal mechanisms in Global CMT convention. Parameters are expected 
+            to be in the following columns:
+
+            1,2: longitude, latitude of event (-: option interchanges order)
+
+            3: depth of event in kilometers
+
+            4,5,6: strike, dip, and rake of plane 1
+
+            7,8,9: strike, dip, and rake of plane 2
+
+            10,11: mantissa and exponent of moment in dyne-cm
+
+            12,13: longitude, latitude at which to place beachball if -C is used 
+            (optional). Using 0,0 in columns 8 and 9 will plot the beach ball at 
+            the longitude, latitude given in columns 1 and 2. The -: option will 
+            interchange the order of columns (1,2) and (12,13).
+
+            14: Text string to appear near the beach ball (optional).
+        
+        {Sm}|d|zscale[+ffont][+jjustify][+odx[/dy]]
+
+            Seismic moment tensor. -Sm plots the full seismic moment tensor. 
+            -Sz plots the deviatoric part of the moment tensor (zero trace). 
+            -Sd plots the closest double couple defined from the moment tensor 
+            (zero trace and zero determinant). Global CMT moment tensors are 
+            deviatoric, so -Sm and -Sz will produce the same result, but 
+            -Sd will not, unless the input moment tensor is already a double 
+            couple. Parameters are expected to be in the following columns:
+
+            1,2: longitude, latitude of event (-: option interchanges order)
+
+            3: depth of event in kilometers
+
+            4,5,6,7,8,9: mrr, mtt, mff, mrt, mrf, mtf in 10*exponent dynes-cm
+
+            10: exponent
+
+            11,12: longitude, latitude at which to place beachball if -C is used 
+            (optional). Using 0,0 in columns 8 and 9 will plot the beach ball at 
+            the longitude, latitude given in columns 1 and 2. The -: option will 
+            interchange the order of columns (1,2) and (11,12).
+
+            13: Text string to appear near the beach ball (optional).
+        
+        {Sp}scale[+ffont][+jjustify][+odx[/dy]]
+
+            Focal mechanisms given with partial data on both planes. Parameters 
+            are expected to be in the following columns:
+
+            1,2: longitude, latitude of event (-: option interchanges order)
+
+            3: depth of event in kilometers
+
+            4,5: strike, dip of plane 1
+
+            6: strike of plane 2
+
+            7: must be -1/+1 for a normal/inverse fault
+
+            8: magnitude
+
+            9,10: longitude, latitude at which to place beachball if -C is used 
+            (optional). Using 0,0 in columns 8 and 9 will plot the beach ball at 
+            the longitude, latitude given in columns 1 and 2. The -: option will 
+            interchange the order of columns (1,2) and (9,10).
+
+            11: Text string to appear near the beach ball (optional).
+        {Sx}|y|tscale[+ffont][+jjustify][+odx[/dy]]
+
+            Principal axis. Use -Sx to plot full seismic moment tensor. Use -Sy 
+            to plot the closest double couple defined from the moment tensor 
+            (zero trace and zero determinant). Use -St to plot the deviatoric 
+            part of the moment tensor (zero trace). Parameters are expected to 
+            be in the following columns:
+
+            1,2: longitude, latitude of event (-: option interchanges order)
+
+            3: depth of event in kilometers
+
+            4,5,6,7,8,9,10,11,12: value (in 10*exponent dynes-cm), azimuth, 
+            plunge of T, N, P axis.
+
+            13: exponent
+
+            14,15: longitude, latitude at which to place beachball if -C is used 
+            (optional). Using 0,0 in columns 8 and 9 will plot the beach ball at 
+            the longitude, latitude given in columns 1 and 2. The -: option will 
+            interchange the order of columns (1,2) and (14,15).
+
+            16: Text string to appear near the beach ball (optional).
+        
+
+-C[pen][+ssize]
+    Offsets focal mechanisms to the longitude, latitude specified in the last 
+    two columns of the input file before the (optional) text string. A small 
+    circle is plotted at the initial location and a line connects the beachball 
+    to the circle. Specify pen and optionally append +ssize to change the line 
+    style and/or size of the circle. [Defaults: pen as given by -W; size is 0]. 
+
+        """
+        kwargs = self._preprocess(**kwargs)
+
+        kind = data_kind(table)
+
+  
+        with Session() as lib:
+            # Choose how data will be passed in to the module
+            if kind == "file":
+                file_context = dummy_context(table)
+            elif kind == "matrix":
+                file_context = lib.virtualfile_from_matrix(table)
+
+            with file_context as fname:
+                arg_str = " ".join([fname, build_arg_string(kwargs)])
+                lib.call_module("psmeca", arg_str)
